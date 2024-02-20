@@ -11,4 +11,4 @@ Currently, its use relies on the ontology also having been distributed in the bS
   * select a CSV file containing information on the ontology; adhering to a specific structure (*)
 * The IDS is automatically generated and downloaded as a file
 
-(*) See the example CSV of (a part of) the [Waternet ontology](https://otl.waternet.nl) in the subfolder "onto/waternet". This folder also includes the SPARQL query used to obtain that CSV and the results of the transformation to the JSON importdatamodel of the bSDD.
+(*) See the example CSV of (a part of) the [Waternet ontology](https://otl.waternet.nl) in the subfolder "onto/waternet". This folder also includes the SPARQL query used to obtain that CSV and the results of the generation of the IDS.
