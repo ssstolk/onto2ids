@@ -1,0 +1,62 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX sh: <http://www.w3.org/ns/shacl#>
+PREFIX bs: <https://w3id.org/def/basicsemantics-owl#>
+PREFIX nen2660: <https://w3id.org/nen2660/def#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT DISTINCT
+  ?ontoClassPrefLabel ?ontoClassURI   # e.g. "deur" from W-OTL
+  ?ifcClassLabel                      # e.g. IfcDoor, translation of "deur" as ?ontoClass
+  ?ontoPropertyPrefLabel ?ontoPropertyURI                                            # property from W-OTL relevant for the class
+  ?ontoPropertyDatatype                                                              # property requirements (datatype)
+  (GROUP_CONCAT(?ontoPropertyEnumValue; separator="|") AS ?ontoPropertyEnumValues)   # property requirements (enum values)
+  ?ontoPropertyCardinalityMin ?ontoPropertyCardinalityMax                            # property requirements (cardinality)
+
+WHERE {
+  ?ontoClassURI skos:prefLabel ?ontoClassPrefLabel .
+  ?ontoClassURI rdfs:subClassOf+ bs:PhysicalObject .
+  FILTER (STRSTARTS(STR(?ontoClassURI), "https://otl.waternet.nl/def/")) .
+  FILTER (lang(?ontoClassPrefLabel) = "nl" || lang(?ontoClassPrefLabel) = "") .
+  
+  OPTIONAL {
+    ?shape sh:targetClass ?ontoClassURI .
+    ?shape sh:property ?shapeProperty .
+    #OPTIONAL {
+    #  ?shapeProperty sh:minCount ?ontoPropertyCardinalityMin .
+    #}
+    BIND (1 AS ?ontoPropertyCardinalityMin) .
+    OPTIONAL {
+      ?shapeProperty sh:maxCount ?ontoPropertyCardinalityMax .
+    }
+    ?shapeProperty sh:path ?ontoPropertyURI .
+    ?ontoPropertyURI skos:prefLabel ?ontoPropertyPrefLabel .
+    OPTIONAL {
+      ?shapeProperty sh:datatype ?ontoPropertyDatatypeURI .
+      BIND (IF (?ontoPropertyDatatypeURI = xsd:string, "IFCTEXT", 
+            IF (?ontoPropertyDatatypeURI = xsd:boolean, "IFCBOOLEAN", 
+            IF (?ontoPropertyDatatypeURI IN (xsd:byte, xsd:decimal, xsd:int, xsd:integer, xsd:long,	xsd:negativeInteger, xsd:nonNegativeInteger, xsd:nonPositiveInteger, xsd:positiveInteger, xsd:short, xsd:unsignedLong, xsd:unsignedInt, xsd:unsignedShort, xsd:unsignedByte), "IFCINTEGER", 
+            IF (?ontoPropertyDatatypeURI IN (xsd:float, xsd:double), "IFCREAL", 
+            IF (?ontoPropertyDatatypeURI = xsd:gYear, "IFCDATE", 
+                ?blank)))))
+            AS ?ontoPropertyDatatype) .
+    }
+    OPTIONAL {
+      ?shapeProperty sh:class ?ontoPropertyEnumClass .
+      ?ontoPropertyEnumValueURI a ?ontoPropertyEnumClass .
+      ?ontoPropertyEnumValueURI skos:prefLabel ?ontoPropertyEnumValue .
+      BIND ("IFCTEXT" AS ?ontoPropertyDatatype) .
+    }
+  }
+  OPTIONAL {
+    # NOTE: for test purposes, mapping between IFC and W-OTL was based W-OTL prefLabel; 
+	#       in the future, this mapping will be based on W-OTL URI
+    ?mapping  skos:prefLabel  ?ontoClassPrefLabel .
+    ?mapping  skos:related    ?ifcClassURI .
+    BIND (STRAFTER(STR(?ifcClassURI), "class/") AS ?ifcClassLabel) .
+    FILTER (BOUND(?ifcClassLabel) && ?ifcClassLabel !="")
+  }
+}
+GROUP BY ?ontoClassURI ?ontoClassPrefLabel ?ontoPropertyURI ?ontoPropertyPrefLabel ?ontoPropertyDatatype ?ontoPropertyCardinalityMin ?ontoPropertyCardinalityMax
