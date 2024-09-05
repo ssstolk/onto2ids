@@ -2,7 +2,7 @@
 
 <!--
   SPDX-License-Identifier: Apache-2.0
-  Copyright © 2023 Sander Stolk & Quint Netten
+  Copyright © 2023 Sander Stolk
 -->
 
 <HTML>
@@ -12,6 +12,7 @@
 	<script src="js/ifc.js"></script>
 	<script src="js/onto2ids_v0_9_6.js"></script>
 	<script src="js/onto2ids_v0_9_7.js"></script>
+	<script src="js/onto2ids_v1_0.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/build/md5.min.js"></script>
 	<link rel="stylesheet" href="css/custom.css" />
 </HEAD>
@@ -33,13 +34,14 @@
     "title": "IDS test Waternet",
     "author": "sander.stolk@waternet.nl",
     "date": "2024-01-01",
-    "ifcVersion": "IFC4"
+    "ifcVersion": "IFC4X3_ADD2"
 }</textarea><br/><br/>
 
 <label for="ids-info-idsversion">Select IDS version:</label><br/>
 <select name="idsVersion" id="ids-info-idsversion">
   <option value="0_9_6">IDS v0.9.6</option>
-  <option value="0_9_7"  selected="selected">IDS v0.9.7</option>
+  <option value="0_9_7">IDS v0.9.7</option>
+  <option value="1_0"  selected="selected">IDS v1.0</option>
 </select><br/><br/>
 
 <label for="dropzone-files">CSV file of contents ontology:</label><br/>
@@ -74,3 +76,6 @@ function download(content, mimeType, filename){
 </script>
 
 </HTML>
+
+
+
