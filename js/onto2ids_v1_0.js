@@ -106,7 +106,7 @@ class Onto2ids_v1_0 {
 				}
 				
 			
-				// note: carninality attribute for a property has to be either prohibited, optional or required; any other option is not allowed in the IDS specification (v0.9.7).
+				// note: cardinality attribute for a property has to be either prohibited, optional or required; any other option is not allowed in the IDS specification (v0.9.7).
 				
 				var PropertyCardinality;
 				if	(specObject.ontoPropertyCardinalityMax == 0) {
