@@ -12,3 +12,6 @@ Currently, its use relies on the ontology also having been distributed in the bS
 * The IDS is automatically generated and downloaded as a file
 
 (*) See the example CSV of (a part of) the [Waternet ontology](https://otl.waternet.nl) in the subfolder "onto/waternet". This folder also includes the SPARQL query used to obtain that CSV and the results of the generation of the IDS.
+
+## Technical documentation
+For further details on the tooling and its use, we refer the reader to the [technical report](https://github.com/ssstolk/onto2ids/blob/main/docs/Towards%20ontology-driven%20information%20exchange%20at%20Waternet.pdf) included in the docs folder.
