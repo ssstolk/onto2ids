@@ -9,8 +9,10 @@
 <HEAD>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 	<script src="js/jquery.csv.js"></script>
-    <script src="js/onto2ids.js"></script>
 	<script src="js/ifc.js"></script>
+	<script src="js/onto2ids_v0_9_6.js"></script>
+	<script src="js/onto2ids_v0_9_7.js"></script>
+	<script src="js/onto2ids_v1_0.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-md5@0.7.3/build/md5.min.js"></script>
 	<link rel="stylesheet" href="css/custom.css" />
 </HEAD>
@@ -32,8 +34,15 @@
     "title": "IDS test Waternet",
     "author": "sander.stolk@waternet.nl",
     "date": "2024-01-01",
-    "ifcVersion": "IFC4"
-}</textarea><br/>
+    "ifcVersion": "IFC4X3_ADD2"
+}</textarea><br/><br/>
+
+<label for="ids-info-idsversion">Select IDS version:</label><br/>
+<select name="idsVersion" id="ids-info-idsversion">
+  <option value="0_9_6">IDS v0.9.6</option>
+  <option value="0_9_7">IDS v0.9.7</option>
+  <option value="1_0"  selected="selected">IDS v1.0</option>
+</select><br/><br/>
 
 <label for="dropzone-files">CSV file of contents ontology:</label><br/>
 <input class="dropzone" id="dropzone-files" type="file" onchange="loadFile(this.files[0])"/><br/>
@@ -42,16 +51,17 @@
 </BODY>
 
 
-
-
 <script>
+
 async function loadFile(file) {
-    const ontoInfo = JSON.parse(document.getElementById("bsdd-info").value);
+	const ontoInfo = JSON.parse(document.getElementById("bsdd-info").value);
     const idsInfo  = JSON.parse(document.getElementById("ids-info").value);
 	const csvInput = await file.text();
-    const xmlOutput = Onto2ids.fromCSV(csvInput, ontoInfo, idsInfo);
-    console.log(xmlOutput);
-    download(xmlOutput, "application/xml", idsInfo.title + ".ids");
+	
+	const idsVersion  = document.getElementById("ids-info-idsversion").value;
+	eval("var xmlOutput = Onto2ids_v" + idsVersion + ".fromCSV(csvInput, ontoInfo, idsInfo)");
+    download(xmlOutput, "application/xml", idsInfo.title + " v" + idsVersion + ".ids");
+	
 }
 
 function download(content, mimeType, filename){
@@ -61,6 +71,7 @@ function download(content, mimeType, filename){
   a.setAttribute('href', url) // Set "a" element link
   a.setAttribute('download', filename) // Set download filename
   a.click() // Start downloading
+
 }
 </script>
 

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: Apache-2.0
    Copyright © 2024 Sander Stolk */
 
-class Onto2ids {
+class Onto2ids_v0_9_6 {
 
     /* Transforms input CSV content to buildingSMART IDS in its XML format.
 	   For documentation on the buildinSMART IDS, see: https://github.com/buildingSMART/IDS/ .
@@ -18,11 +18,12 @@ class Onto2ids {
        - ?ontoPropertyCardinalityMax property requirements: max cardinality
        @param ontoInfo: JSON object with fields 'OrganizationCode', 'DomainName', 'DomainCode', 'DomainVersion'
 	   @param idsInfo: JSON object with fields 'title', 'author', 'date', 'ifcVersion' 
+	   @param idsVersion: Drop down menu for executing different scripts based on the IDS version
     */
     static fromCSV(input, ontoInfo, idsInfo) {
 
         const csvObjects = $.csv.toObjects(input); // see https://github.com/evanplaice/jquery-csv/#documentation		
-		const csvObjectsGrouped = Onto2ids.groupBy(csvObjects, "ontoClassURI");
+		const csvObjectsGrouped = this.groupBy(csvObjects, "ontoClassURI");
 		console.log(JSON.stringify(csvObjectsGrouped));
 
 		let idsXML =
@@ -41,10 +42,24 @@ class Onto2ids {
         <ids:entity>
           <ids:name>
             <xs:restriction base="xs:string">`;
-			for (const ifcClassName of IFC_CLASSNAMES) {
-				idsXML +=	`
-              <xs:enumeration value="${ifcClassName}" />`;
-			}
+
+			if (idsInfo.ifcVersion == "IFC2X3") {
+				for (const ifcClassName of IFC2X3_CLASSNAMES) {
+					idsXML += `
+					<xs:enumeration value="${ifcClassName}" />`;
+				}
+			} else if (idsInfo.ifcVersion == "IFC4") {
+				for (const ifcClassName of IFC4_CLASSNAMES) {
+					idsXML += `
+					<xs:enumeration value="${ifcClassName}" />`;
+				}
+			} else if (idsInfo.ifcVersion == "IFC4X3") {
+				for (const ifcClassName of IFC4X3_CLASSNAMES) {
+					idsXML += `
+					<xs:enumeration value="${ifcClassName}" />`;
+				}
+			} else {}
+			
 			idsXML += `
             </xs:restriction>
           </ids:name>
@@ -63,20 +78,9 @@ class Onto2ids {
 			idsXML += `
     <ids:specification ifcVersion="${idsInfo.ifcVersion}" name="${ontoInfo.DomainName} - ${specObjects[0].ontoClassPrefLabel}" minOccurs="0" maxOccurs="unbounded" description="Requirements for: ${specObjects[0].ontoClassPrefLabel}">
       <ids:applicability>
-        <ids:entity>
-          <ids:name>
-            <xs:restriction base="xs:string">`;
-			for (const ifcClassName of IFC_CLASSNAMES) {
-				idsXML +=	`
-              <xs:enumeration value="${ifcClassName}" />`;
-			}
-			idsXML += `
-            </xs:restriction>
-          </ids:name>
-        </ids:entity>
         <ids:classification>
           <ids:value>
-            <ids:simpleValue>${Onto2ids.getLocalname(ontoClassURI)}</ids:simpleValue>
+            <ids:simpleValue>${this.getLocalname(ontoClassURI)}</ids:simpleValue>
           </ids:value>
           <ids:system>
             <ids:simpleValue>${ontoInfo.DomainName}</ids:simpleValue>
